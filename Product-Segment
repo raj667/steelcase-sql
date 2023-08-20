@@ -1,1 +1,35 @@
+# Product Segment
 
+with cte as(
+select *, rank() over (partition by state order by Order_Count desc) as rnk from (
+SELECT 
+    c.state, p.category, p.sub_category, COUNT(p.sub_category) as Order_Count
+FROM
+    master_customer c
+        LEFT JOIN
+    store_data sd USING (customer_id)
+        LEFT JOIN
+    master_product p ON sd.product_id = p.ï»¿Product_ID
+GROUP BY 1 , 2, 3
+order by 4 desc)t)
+select state, category, sub_category, Order_Count from cte
+where rnk = 1
+order by 4 desc;
+
+#  
+
+with cte as(
+select *, rank() over (partition by date_month order by Orders desc) as rnk from (
+SELECT 
+    month(sd.order_date) as date_month, p.sub_category as product, COUNT(p.sub_category) as Orders
+FROM
+    master_customer c
+        LEFT JOIN
+    store_data sd USING (customer_id)
+        LEFT JOIN
+    master_product p ON sd.product_id = p.ï»¿Product_ID
+GROUP BY 1 , 2
+order by 3 desc)t)
+select date_month, product, Orders from cte
+where rnk = 1
+order by 1;
