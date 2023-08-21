@@ -1,1 +1,20 @@
+# Customer-Segment
+
+# To analyze which state has the most customers
+
+with cte as(
+select *, rank() over (partition by state order by Customer_Count desc) as rnk from (
+SELECT 
+	c.state, COUNT(c.Customer_ID) as Customer_Count
+FROM
+    master_customer c
+        LEFT JOIN
+    store_data sd USING (customer_id)
+        LEFT JOIN
+    master_product p ON sd.product_id = p.ï»¿Product_ID
+GROUP BY 1
+order by 2 desc)t)
+select state, Customer_Count from cte
+where rnk = 1
+order by 2 desc;
 
