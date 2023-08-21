@@ -1,11 +1,10 @@
 # Customer-Segment
 
-# To analyze which state has the most customers
+# To analyze customer percentage from each state
 
-with cte as(
-select *, rank() over (partition by state order by Customer_Count desc) as rnk from (
+with cte1 as(
 SELECT 
-	c.state, COUNT(c.Customer_ID) as Customer_Count
+    c.state, COUNT(c.Customer_ID) AS Customer_Count
 FROM
     master_customer c
         LEFT JOIN
@@ -13,8 +12,11 @@ FROM
         LEFT JOIN
     master_product p ON sd.product_id = p.ï»¿Product_ID
 GROUP BY 1
-order by 2 desc)t)
-select state, Customer_Count from cte
-where rnk = 1
-order by 2 desc;
+ORDER BY 2 DESC),
+
+cte2 as (select sum(customer_count) as customer_sum from cte1),
+
+cte3 as (select * from cte1 left join cte2 on cte1.customer_count<cte2.customer_sum)
+
+select state, customer_count, round((customer_count/customer_sum)*100,2) as Customer_Percentage from cte3;
 
