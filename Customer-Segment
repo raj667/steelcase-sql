@@ -1,6 +1,68 @@
 # Customer-Segment
 
-# To Analyze Customer Percentage From Each State
+#1 To Analyse Preferred Product for each Age Group
+
+with cte1 as(
+select *, rank() over (partition by state order by orders desc) as rnk from (
+SELECT 
+    state,
+    age_group,
+    sub_category AS Product,
+    COUNT(sub_category) AS Orders
+FROM
+    (SELECT 
+        c.state,
+            c.age,
+            CASE
+                WHEN c.age <= 30 THEN '18-29'
+                WHEN c.age BETWEEN 30 AND 50 THEN '30-50'
+                ELSE 'over 50'
+            END AS age_group,
+            p.sub_category
+    FROM
+        master_customer c
+    LEFT JOIN store_data sd USING (customer_id)
+    LEFT JOIN master_product p ON sd.product_id = p.ï»¿Product_ID) t
+GROUP BY 1 , 2 , 3
+ORDER BY 4 DESC , 1 ASC)f
+where age_group = '30-50'),
+
+cte2 as 
+(select *, rank() over (partition by state order by orders desc) as rnk from (
+SELECT 
+    state,
+    age_group,
+    sub_category AS Product,
+    COUNT(sub_category) AS Orders
+FROM
+    (SELECT 
+        c.state,
+            c.age,
+            CASE
+                WHEN c.age <= 30 THEN '18-29'
+                WHEN c.age BETWEEN 30 AND 50 THEN '30-50'
+                ELSE 'over 50'
+            END AS age_group,
+            p.sub_category
+    FROM
+        master_customer c
+    LEFT JOIN store_data sd USING (customer_id)
+    LEFT JOIN master_product p ON sd.product_id = p.ï»¿Product_ID) m
+GROUP BY 1 , 2 , 3
+ORDER BY 4 DESC , 1 ASC)s
+where age_group = '18-29'),
+
+cte3 as(
+select state, age_group, Product from cte1
+where rnk =1
+union all
+select state, age_group, Product from cte2
+where rnk=1)
+
+select * from cte3
+order by state, age_group asc;
+
+#2 To Analyze Customer Percentage From Each State
 
 with cte1 as(
 SELECT 
@@ -20,7 +82,7 @@ cte3 as (select * from cte1 left join cte2 on cte1.customer_each_state<cte2.tota
 
 select state, customer_each_state, round((customer_each_state/total_customer)*100,2) as Customer_Percentage from cte3;
 
-# To Analyse Preferred Segment for Customers in Each State
+#3 To Analyse Preferred Segment for Customers in Each State
 
 with cte as(
 Select *, dense_rank() over (partition by state order by segment_Orders desc) as rnk from (
