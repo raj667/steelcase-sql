@@ -1,6 +1,6 @@
 # Product Segment
 
-# To analyze which product sells the most in each state
+# To Analyze Which Product Sells The Most In Each State
 
 with cte as(
 select *, rank() over (partition by state order by Order_Count desc) as rnk from (
@@ -18,7 +18,7 @@ select state, category, sub_category, Order_Count from cte
 where rnk = 1
 order by 4 desc;
 
-#  To analyze which product sells the most each month
+#  To Analyze Which Product Sells The Most Each Month
 
 with cte as(
 select *, rank() over (partition by date_month order by Orders desc) as rnk from (
