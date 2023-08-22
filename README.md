@@ -6,4 +6,8 @@ This project analyses SteelCase Inc. sales data over 4 years (2017-2020) to iden
 
 # Product Segment
 
-This segment has code analyzing Steelcase Inc. product sales over a 4-year period (2017-2020)
+This segment analyzes Steelcase Inc. product sales over a 4-year period (2017-2020)
+
+# Consumer Segment
+
+This segment analyzes Steelcase Inc. customer purchases over a 4-year period (2017-2020)
